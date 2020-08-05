@@ -15,16 +15,16 @@
  */
 package com.wl4g.devops.coss.server;
 
-import static com.wl4g.devops.components.tools.common.lang.Assert2.notEmptyOf;
-import static com.wl4g.devops.components.tools.common.lang.Assert2.notNullOf;
-import static com.wl4g.devops.components.tools.common.log.SmartLoggerFactory.getLogger;
+import static com.wl4g.components.common.lang.Assert2.notEmptyOf;
+import static com.wl4g.components.common.lang.Assert2.notNullOf;
+import static com.wl4g.components.common.log.SmartLoggerFactory.getLogger;
 
 import java.util.List;
 
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 
-import com.wl4g.devops.components.tools.common.log.SmartLogger;
+import com.wl4g.components.common.log.SmartLogger;
 import com.wl4g.devops.coss.server.config.ChannelServerProperties;
 
 /**

@@ -33,12 +33,12 @@ import com.wl4g.devops.coss.common.model.CossPutObjectResult;
 import com.wl4g.devops.coss.common.model.CossRestoreObjectRequest;
 import com.wl4g.devops.coss.common.model.CossRestoreObjectResult;
 
-import static com.wl4g.devops.components.tools.common.lang.Assert2.notNull;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 
 import java.io.InputStream;
 import java.net.URL;
 
+import static com.wl4g.components.common.lang.Assert2.notNull;
 import static java.lang.String.format;
 
 /**

@@ -47,7 +47,7 @@ import java.lang.reflect.Method;
 import java.util.Date;
 import java.util.concurrent.atomic.AtomicLong;
 
-import static com.wl4g.devops.components.tools.common.io.FileSizeUtils.getHumanReadable;
+import static com.wl4g.components.common.io.FileSizeUtils.getHumanReadable;
 import static com.wl4g.devops.coss.utils.PosixFileSystemUtils.*;
 import static java.lang.String.format;
 import static java.lang.String.valueOf;

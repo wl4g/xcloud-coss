@@ -15,11 +15,11 @@
  */
 package com.wl4g.devops.coss.server.handler;
 
-import static com.wl4g.devops.components.tools.common.log.SmartLoggerFactory.getLogger;
+import static com.wl4g.components.common.log.SmartLoggerFactory.getLogger;
 import static java.util.Objects.nonNull;
 
-import com.wl4g.devops.components.tools.common.log.SmartLogger;
-import com.wl4g.devops.components.tools.common.remoting.standard.HttpMediaType;
+import com.wl4g.components.common.log.SmartLogger;
+import com.wl4g.components.common.remoting.standard.HttpMediaType;
 
 import io.netty.channel.ChannelDuplexHandler;
 import io.netty.channel.ChannelFuture;

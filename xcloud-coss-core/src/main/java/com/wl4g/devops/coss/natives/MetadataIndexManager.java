@@ -15,10 +15,10 @@
  */
 package com.wl4g.devops.coss.natives;
 
-import com.wl4g.devops.components.tools.common.io.FileIOUtils;
-import com.wl4g.devops.components.tools.common.io.FileLockUtils;
-import com.wl4g.devops.components.tools.common.lang.Assert2;
-import com.wl4g.devops.components.tools.common.serialize.JacksonUtils;
+import com.wl4g.components.common.io.FileIOUtils;
+import com.wl4g.components.common.io.FileLockUtils;
+import com.wl4g.components.common.lang.Assert2;
+import com.wl4g.components.common.serialize.JacksonUtils;
 import com.wl4g.devops.coss.common.model.metadata.BucketStatusMetaData;
 import com.wl4g.devops.coss.common.model.metadata.ObjectsStatusMetaData;
 

@@ -23,8 +23,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import com.wl4g.components.core.framework.operator.GenericOperatorAdapter;
 import com.wl4g.devops.CossServer;
-import com.wl4g.devops.common.framework.operator.GenericOperatorAdapter;
 import com.wl4g.devops.coss.ServerCossEndpoint;
 import com.wl4g.devops.coss.common.CossEndpoint;
 import com.wl4g.devops.coss.common.CossEndpoint.CossProvider;

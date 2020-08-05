@@ -15,14 +15,14 @@
  */
 package com.wl4g.devops.coss.access;
 
-import static com.wl4g.devops.components.tools.common.lang.Assert2.notNullOf;
+import static com.wl4g.components.common.lang.Assert2.notNullOf;
 
 import java.io.InputStream;
 import java.nio.file.FileSystem;
 
 import org.apache.sshd.common.file.FileSystemAware;
 
-import com.wl4g.devops.common.framework.operator.GenericOperatorAdapter;
+import com.wl4g.components.core.framework.operator.GenericOperatorAdapter;
 import com.wl4g.devops.coss.ServerCossEndpoint;
 import com.wl4g.devops.coss.access.model.GenericCossParameter;
 import com.wl4g.devops.coss.common.CossEndpoint;

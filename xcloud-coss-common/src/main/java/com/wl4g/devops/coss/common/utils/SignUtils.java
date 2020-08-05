@@ -19,7 +19,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.util.*;
 
-import com.wl4g.devops.components.tools.common.lang.Assert2;
+import com.wl4g.components.common.lang.Assert2;
 import com.wl4g.devops.coss.common.auth.Credentials;
 import com.wl4g.devops.coss.common.exception.ClientCossException;
 import com.wl4g.devops.coss.common.internal.RequestMessage;

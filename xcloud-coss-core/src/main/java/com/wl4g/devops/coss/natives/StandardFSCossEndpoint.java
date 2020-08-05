@@ -16,7 +16,7 @@
 package com.wl4g.devops.coss.natives;
 
 import com.google.common.hash.HashCode;
-import com.wl4g.devops.components.tools.common.io.FileIOUtils;
+import com.wl4g.components.common.io.FileIOUtils;
 import com.wl4g.devops.coss.ServerCossEndpoint;
 import com.wl4g.devops.coss.common.exception.CossException;
 import com.wl4g.devops.coss.common.exception.ServerCossException;
@@ -55,9 +55,9 @@ import java.util.List;
 import java.util.Set;
 
 import static com.google.common.hash.Hashing.md5;
-import static com.wl4g.devops.components.tools.common.io.FileDeletionUtils.deleteAnyone;
-import static com.wl4g.devops.components.tools.common.lang.Assert2.isTrue;
-import static com.wl4g.devops.components.tools.common.lang.Assert2.notNullOf;
+import static com.wl4g.components.common.io.FileDeletionUtils.deleteAnyone;
+import static com.wl4g.components.common.lang.Assert2.isTrue;
+import static com.wl4g.components.common.lang.Assert2.notNullOf;
 import static com.wl4g.devops.coss.common.model.ACL.*;
 import static com.wl4g.devops.coss.common.model.metadata.ObjectsStatusMetaData.ObjectStatusMetaData;
 import static java.lang.String.format;

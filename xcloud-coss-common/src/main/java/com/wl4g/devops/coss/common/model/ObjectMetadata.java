@@ -15,7 +15,7 @@
  */
 package com.wl4g.devops.coss.common.model;
 
-import static com.wl4g.devops.components.tools.common.serialize.JacksonUtils.toJSONString;
+import static com.wl4g.components.common.serialize.JacksonUtils.toJSONString;
 import static java.util.Objects.isNull;
 
 import java.util.Map;

@@ -21,7 +21,7 @@ import java.io.RandomAccessFile;
 import java.nio.channels.FileChannel;
 import java.nio.channels.FileLock;
 
-import com.wl4g.devops.components.tools.common.io.FileIOUtils;
+import com.wl4g.components.common.io.FileIOUtils;
 
 /**
  * @author vjay

@@ -15,9 +15,9 @@
  */
 package com.wl4g.devops.coss.server.handler;
 
-import static com.wl4g.devops.components.tools.common.lang.Assert2.notNull;
-
 import io.netty.handler.codec.http.HttpMethod;
+
+import static com.wl4g.components.common.lang.Assert2.notNull;
 import static io.netty.handler.codec.http.HttpMethod.*;
 
 public enum CossAction {

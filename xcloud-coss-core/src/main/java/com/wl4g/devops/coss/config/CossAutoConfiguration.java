@@ -15,7 +15,7 @@
  */
 package com.wl4g.devops.coss.config;
 
-import com.wl4g.devops.common.framework.operator.GenericOperatorAdapter;
+import com.wl4g.components.core.framework.operator.GenericOperatorAdapter;
 import com.wl4g.devops.coss.ServerCossEndpoint;
 import com.wl4g.devops.coss.common.CossEndpoint.CossProvider;
 import com.wl4g.devops.coss.natives.MetadataIndexManager;

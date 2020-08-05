@@ -15,9 +15,9 @@
  */
 package com.wl4g.devops.coss.access;
 
-import com.wl4g.devops.common.framework.operator.GenericOperatorAdapter;
-import com.wl4g.devops.common.web.BaseController;
-import com.wl4g.devops.common.web.RespBase;
+import com.wl4g.components.core.framework.operator.GenericOperatorAdapter;
+import com.wl4g.components.core.web.BaseController;
+import com.wl4g.components.core.web.RespBase;
 import com.wl4g.devops.coss.ServerCossEndpoint;
 import com.wl4g.devops.coss.access.model.GenericCossParameter;
 import com.wl4g.devops.coss.access.model.ObjectMetadataModel;
@@ -51,7 +51,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
 
-import static com.wl4g.devops.components.tools.common.lang.Assert2.*;
+import static com.wl4g.components.common.lang.Assert2.*;
 import static com.wl4g.devops.coss.natives.MetadataIndexManager.BUCKET_METADATA;
 
 /**

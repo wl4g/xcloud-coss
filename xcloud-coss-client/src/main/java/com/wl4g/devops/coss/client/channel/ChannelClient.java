@@ -41,8 +41,8 @@ import com.wl4g.devops.coss.common.internal.define.COSSConstants;
 import com.wl4g.devops.coss.common.utils.HttpMethod;
 import com.wl4g.devops.coss.common.utils.LogUtils;
 
-import static com.wl4g.devops.components.tools.common.lang.Assert2.notNull;
 import static com.wl4g.devops.coss.common.utils.LogUtils.getLog;
+import static com.wl4g.components.common.lang.Assert2.notNull;
 import static com.wl4g.devops.coss.client.utils.COSSUtils.COMMON_RESOURCE_MANAGER;
 import static com.wl4g.devops.coss.common.utils.LogUtils.logException;
 

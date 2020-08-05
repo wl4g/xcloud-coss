@@ -15,8 +15,8 @@
  */
 package com.wl4g.devops.coss.server;
 
-import static com.wl4g.devops.components.tools.common.lang.Assert2.notNull;
-import static com.wl4g.devops.components.tools.common.lang.Assert2.notNullOf;
+import static com.wl4g.components.common.lang.Assert2.notNull;
+import static com.wl4g.components.common.lang.Assert2.notNullOf;
 import static java.util.Objects.nonNull;
 import static org.apache.commons.lang3.SystemUtils.IS_OS_LINUX;
 

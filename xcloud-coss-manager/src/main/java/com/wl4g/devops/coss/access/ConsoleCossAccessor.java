@@ -15,7 +15,7 @@
  */
 package com.wl4g.devops.coss.access;
 
-import static com.wl4g.devops.components.tools.common.lang.Assert2.notNullOf;
+import static com.wl4g.components.common.lang.Assert2.notNullOf;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -23,10 +23,7 @@ import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.util.Map;
 
-import com.wl4g.devops.common.framework.operator.GenericOperatorAdapter;
-import com.wl4g.devops.components.shell.annotation.ShellComponent;
-import com.wl4g.devops.components.shell.annotation.ShellMethod;
-import com.wl4g.devops.components.shell.annotation.ShellOption;
+import com.wl4g.components.core.framework.operator.GenericOperatorAdapter;
 import com.wl4g.devops.coss.ServerCossEndpoint;
 import com.wl4g.devops.coss.access.model.GenericCossParameter;
 import com.wl4g.devops.coss.common.CossEndpoint;
@@ -44,6 +41,9 @@ import com.wl4g.devops.coss.common.model.CossPutObjectResult;
 import com.wl4g.devops.coss.common.model.bucket.Bucket;
 import com.wl4g.devops.coss.common.model.bucket.BucketList;
 import com.wl4g.devops.coss.common.model.bucket.BucketMetadata;
+import com.wl4g.shell.annotation.ShellComponent;
+import com.wl4g.shell.annotation.ShellMethod;
+import com.wl4g.shell.annotation.ShellOption;
 
 /**
  * Console based coss accessor
