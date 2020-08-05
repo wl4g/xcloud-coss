@@ -19,7 +19,7 @@ import org.junit.runner.RunWith;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import com.wl4g.devops.CossServer;
+import com.wl4g.CossServer;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = CossServer.class, properties = {})
