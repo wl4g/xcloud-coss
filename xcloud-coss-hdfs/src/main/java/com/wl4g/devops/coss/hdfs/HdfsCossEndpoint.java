@@ -20,6 +20,7 @@ import com.wl4g.devops.coss.common.exception.CossException;
 import com.wl4g.devops.coss.common.exception.ServerCossException;
 import com.wl4g.devops.coss.common.model.bucket.Bucket;
 import com.wl4g.devops.coss.common.model.bucket.BucketMetadata;
+import com.wl4g.devops.coss.common.model.metadata.BucketStatusMetaData;
 import com.wl4g.devops.coss.hdfs.config.HdfsCossProperties;
 import com.wl4g.devops.coss.hdfs.model.HdfsObjectListing;
 import com.wl4g.devops.coss.hdfs.model.HdfsObjectSummary;
@@ -184,6 +185,11 @@ public class HdfsCossEndpoint extends ServerCossEndpoint<HdfsCossProperties> {
 		} catch (IOException e) {
 			throw new ServerCossException(e);
 		}
+	}
+
+	@Override
+	public BucketStatusMetaData getBucketIndex(String bucketName) throws Exception {
+		return null;
 	}
 
 	@SuppressWarnings("unchecked")

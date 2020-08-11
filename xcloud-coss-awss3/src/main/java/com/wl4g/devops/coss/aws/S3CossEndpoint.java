@@ -29,16 +29,11 @@ import com.wl4g.devops.coss.aws.config.S3CossProperties;
 import com.wl4g.devops.coss.aws.model.*;
 import com.wl4g.devops.coss.aws.model.bucket.S3Bucket;
 import com.wl4g.devops.coss.aws.model.bucket.S3BucketList;
-import com.wl4g.devops.coss.common.CossEndpoint.CossProvider;
 import com.wl4g.devops.coss.common.exception.CossException;
 import com.wl4g.devops.coss.common.exception.ServerCossException;
+import com.wl4g.devops.coss.common.model.*;
 import com.wl4g.devops.coss.common.model.bucket.BucketMetadata;
-import com.wl4g.devops.coss.common.model.ACL;
-import com.wl4g.devops.coss.common.model.ObjectMetadata;
-import com.wl4g.devops.coss.common.model.Owner;
-import com.wl4g.devops.coss.common.model.CossPutObjectResult;
-import com.wl4g.devops.coss.common.model.CossRestoreObjectRequest;
-import com.wl4g.devops.coss.common.model.CossRestoreObjectResult;
+import com.wl4g.devops.coss.common.model.metadata.BucketStatusMetaData;
 
 import java.io.InputStream;
 import java.net.URL;
@@ -132,6 +127,11 @@ public class S3CossEndpoint extends ServerCossEndpoint<S3CossProperties> {
 	public void setBucketAcl(String bucketName, ACL acl) {
 		// TODO Auto-generated method stub
 
+	}
+
+	@Override
+	public BucketStatusMetaData getBucketIndex(String bucketName) throws Exception {
+		return null;
 	}
 
 	@SuppressWarnings("unchecked")

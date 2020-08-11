@@ -34,6 +34,10 @@
 			<groupId>com.wl4g</groupId>
 			<artifactId>xcloud-coss-common</artifactId>
 		</dependency>
+		<dependency>
+			<groupId>io.minio</groupId>
+			<artifactId>minio</artifactId>
+		</dependency>
 	</dependencies>
 	<build>
 		<plugins>

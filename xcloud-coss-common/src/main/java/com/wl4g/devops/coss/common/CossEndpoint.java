@@ -17,29 +17,19 @@ package com.wl4g.devops.coss.common;
 
 import com.wl4g.devops.coss.common.exception.CossException;
 import com.wl4g.devops.coss.common.exception.ServerCossException;
+import com.wl4g.devops.coss.common.model.*;
 import com.wl4g.devops.coss.common.model.bucket.Bucket;
 import com.wl4g.devops.coss.common.model.bucket.BucketList;
 import com.wl4g.devops.coss.common.model.bucket.BucketMetadata;
-import com.wl4g.devops.coss.common.model.ACL;
-import com.wl4g.devops.coss.common.model.AccessControlList;
-import com.wl4g.devops.coss.common.model.CopyObjectResult;
-import com.wl4g.devops.coss.common.model.ObjectAcl;
-import com.wl4g.devops.coss.common.model.ObjectListing;
-import com.wl4g.devops.coss.common.model.ObjectMetadata;
-import com.wl4g.devops.coss.common.model.ObjectSummary;
-import com.wl4g.devops.coss.common.model.ObjectSymlink;
-import com.wl4g.devops.coss.common.model.ObjectValue;
-import com.wl4g.devops.coss.common.model.CossPutObjectResult;
-import com.wl4g.devops.coss.common.model.CossRestoreObjectRequest;
-import com.wl4g.devops.coss.common.model.CossRestoreObjectResult;
+import com.wl4g.devops.coss.common.model.metadata.BucketStatusMetaData;
 
-import static org.apache.commons.lang3.StringUtils.isBlank;
-
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 
 import static com.wl4g.components.common.lang.Assert2.notNull;
 import static java.lang.String.format;
+import static org.apache.commons.lang3.StringUtils.isBlank;
 
 /**
  * Composite object storage server file system API.
@@ -140,6 +130,9 @@ public interface CossEndpoint {
 	 * @throws ServerCossException
 	 */
 	void setBucketAcl(String bucketName, ACL acl) throws CossException, ServerCossException;
+
+
+	BucketStatusMetaData getBucketIndex(String bucketName) throws Exception;
 
 	// --- Object's function ---
 
@@ -429,7 +422,12 @@ public interface CossEndpoint {
 		/**
 		 * COSS provider for native fs.
 		 */
-		NativeFs("nativefs");
+		NativeFs("nativefs"),
+
+		/**
+		 * COSS provider for Minio .
+		 */
+		Minio("minio");
 
 		final private String value;
 

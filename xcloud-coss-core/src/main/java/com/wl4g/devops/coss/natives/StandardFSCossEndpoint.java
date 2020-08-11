@@ -23,6 +23,7 @@ import com.wl4g.devops.coss.common.exception.ServerCossException;
 import com.wl4g.devops.coss.common.model.bucket.Bucket;
 import com.wl4g.devops.coss.common.model.bucket.BucketList;
 import com.wl4g.devops.coss.common.model.bucket.BucketMetadata;
+import com.wl4g.devops.coss.common.model.metadata.BucketStatusMetaData;
 import com.wl4g.devops.coss.config.StandardFSCossProperties;
 import com.wl4g.devops.coss.common.model.ACL;
 import com.wl4g.devops.coss.common.model.AccessControlList;
@@ -60,6 +61,7 @@ import static com.wl4g.components.common.lang.Assert2.isTrue;
 import static com.wl4g.components.common.lang.Assert2.notNullOf;
 import static com.wl4g.devops.coss.common.model.ACL.*;
 import static com.wl4g.devops.coss.common.model.metadata.ObjectsStatusMetaData.ObjectStatusMetaData;
+import static com.wl4g.devops.coss.natives.MetadataIndexManager.BUCKET_METADATA;
 import static java.lang.String.format;
 import static java.util.Arrays.asList;
 import static java.util.Objects.isNull;
@@ -405,6 +407,12 @@ public abstract class StandardFSCossEndpoint<C extends StandardFSCossProperties>
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+	}
+
+	@Override
+	public BucketStatusMetaData getBucketIndex(String bucketName) throws Exception {
+		String metaPath = config.getEndpointRootDir() + File.separator + bucketName + BUCKET_METADATA;
+		return metadataManager.readBucketMetaData(new File(metaPath));
 	}
 
 	@Override

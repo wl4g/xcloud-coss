@@ -46,6 +46,10 @@ spring:
           endpoint-hdfs-root-uri: hdfs://owner-node3:8020/coss-bucket
         native:
           endpointRootDir: /tmp/coss-bucket
+        minio:
+          endpoint: http://10.0.0.160:9000
+          accessKey: minioadmin
+          secretKey: minioadmin
         access:
           http-download-base-uri: http://wl4g.debug:14061/coss-manager/webservice/download
   # Datasource configuration.

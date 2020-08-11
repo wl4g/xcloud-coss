@@ -34,6 +34,7 @@ import com.wl4g.devops.coss.common.model.*;
 import com.wl4g.devops.coss.common.model.ObjectMetadata;
 import com.wl4g.devops.coss.common.model.Owner;
 
+import com.wl4g.devops.coss.common.model.metadata.BucketStatusMetaData;
 import org.apache.commons.io.IOUtils;
 
 import java.io.InputStream;
@@ -115,6 +116,11 @@ public class OssCossEndpoint extends ServerCossEndpoint<AliyunOssProperties> {
 	@Override
 	public void setBucketAcl(String bucketName, ACL acl) {
 		ossClient.setBucketAcl(bucketName, CannedAccessControlList.parse(acl.toString()));
+	}
+
+	@Override
+	public BucketStatusMetaData getBucketIndex(String bucketName) throws Exception {
+		return null;
 	}
 
 	@SuppressWarnings("unchecked")
