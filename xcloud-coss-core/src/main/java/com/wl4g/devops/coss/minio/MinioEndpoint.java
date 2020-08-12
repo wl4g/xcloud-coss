@@ -191,6 +191,11 @@ public class MinioEndpoint extends ServerCossEndpoint<MinioFsCossProperties> {
 
     @Override
     public CopyObjectResult copyObject(String sourceBucketName, String sourceKey, String destinationBucketName, String destinationKey) throws CossException, ServerCossException {
+        try {
+            minioClient.copyObject(sourceBucketName,sourceKey,destinationBucketName,destinationKey);
+        } catch (Exception e) {
+            throw new CossException(e);
+        }
         return null;
     }
 
