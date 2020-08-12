@@ -27,14 +27,14 @@ import com.wl4g.devops.coss.common.CossEndpoint;
 import com.wl4g.devops.coss.common.CossEndpoint.CossProvider;
 import com.wl4g.devops.coss.common.exception.CossException;
 import com.wl4g.devops.coss.common.model.ACL;
+import com.wl4g.devops.coss.common.model.CossPutObjectResult;
 import com.wl4g.devops.coss.common.model.ObjectMetadata;
 import com.wl4g.devops.coss.common.model.ObjectValue;
-import com.wl4g.devops.coss.common.model.CossPutObjectResult;
 import com.wl4g.devops.coss.common.model.bucket.Bucket;
 import com.wl4g.devops.coss.common.model.bucket.BucketList;
+import com.wl4g.devops.coss.common.model.metadata.BucketStatusMetaData;
 import com.wl4g.devops.coss.config.CossAccessProperties;
 import com.wl4g.devops.coss.config.StandardFSCossProperties;
-import com.wl4g.devops.coss.common.model.metadata.BucketStatusMetaData;
 import com.wl4g.devops.coss.natives.MetadataIndexManager;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,13 +46,11 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
 
-import static com.wl4g.components.common.lang.Assert2.*;
-import static com.wl4g.devops.coss.natives.MetadataIndexManager.BUCKET_METADATA;
+import static com.wl4g.components.common.lang.Assert2.notNullOf;
 
 /**
  * Web/HTTP based coss accessor
@@ -155,12 +153,10 @@ public class HttpCossAccessor extends BaseController {
 	}
 
 	@RequestMapping("getBucketIndex")
-	public RespBase<Object> getBucketIndex(GenericCossParameter param, String bucketName) throws IOException {
+	public RespBase<Object> getBucketIndex(GenericCossParameter param, String bucketName) throws Exception {
 		RespBase<Object> resp = RespBase.create();
-		// TODO ?? 应在具体cossEndpoint中实现
-		String metaPath = standardFSConfig.getEndpointRootDir() + File.separator + bucketName + BUCKET_METADATA;
-		BucketStatusMetaData metadataIndex = metadataIndexManager.readBucketMetaData(new File(metaPath));
-		resp.setData(metadataIndex);
+		BucketStatusMetaData bucketIndex = getCossEndpoint(param).getBucketIndex(bucketName);
+		resp.setData(bucketIndex);
 		return resp;
 	}
 
@@ -195,7 +191,7 @@ public class HttpCossAccessor extends BaseController {
 			if (Objects.isNull(key)) {
 				key = "";
 			}
-			key = key + File.separator + file.getOriginalFilename();
+			key = key + file.getOriginalFilename();
 			resp.setData(putObject(param, bucketName, key, file.getInputStream(), metadata));
 			return resp;
 		} catch (IOException e) {
