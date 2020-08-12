@@ -15,9 +15,9 @@
  */
 package com.wl4g.devops.coss.access;
 
-import com.wl4g.components.common.web.rest.RespBase;
 import com.wl4g.components.core.framework.operator.GenericOperatorAdapter;
 import com.wl4g.components.core.web.BaseController;
+import com.wl4g.components.core.web.RespBase;
 import com.wl4g.devops.coss.ServerCossEndpoint;
 import com.wl4g.devops.coss.access.model.GenericCossParameter;
 import com.wl4g.devops.coss.access.model.ObjectMetadataModel;
