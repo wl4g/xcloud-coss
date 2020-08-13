@@ -1,7 +1,5 @@
 package com.wl4g.devops.coss.minio;
 
-import com.wl4g.components.common.log.SmartLogger;
-import com.wl4g.components.common.log.SmartLoggerFactory;
 import com.wl4g.devops.coss.ServerCossEndpoint;
 import com.wl4g.devops.coss.common.exception.CossException;
 import com.wl4g.devops.coss.common.exception.ServerCossException;
@@ -11,13 +9,8 @@ import com.wl4g.devops.coss.common.model.bucket.BucketList;
 import com.wl4g.devops.coss.common.model.bucket.BucketMetadata;
 import com.wl4g.devops.coss.common.model.metadata.BucketStatusMetaData;
 import com.wl4g.devops.coss.config.MinioFsCossProperties;
-import io.minio.MinioClient;
-import io.minio.ObjectStat;
-import io.minio.Result;
-import io.minio.errors.InvalidEndpointException;
-import io.minio.errors.InvalidPortException;
+import io.minio.*;
 import io.minio.messages.Item;
-import io.minio.messages.NotificationConfiguration;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.InputStream;
@@ -31,8 +24,6 @@ import java.util.List;
  */
 public class MinioEndpoint extends ServerCossEndpoint<MinioFsCossProperties> {
 
-    SmartLogger log = SmartLoggerFactory.getLogger(getClass());
-
     private MinioFsCossProperties minioFsCossProperties;
 
     private MinioClient minioClient;
@@ -41,7 +32,10 @@ public class MinioEndpoint extends ServerCossEndpoint<MinioFsCossProperties> {
         super(config);
         this.minioFsCossProperties = config;
         try {
-            minioClient = new MinioClient(minioFsCossProperties.getEndpoint(), minioFsCossProperties.getAccessKey(), minioFsCossProperties.getSecretKey());
+            minioClient = MinioClient.builder()
+                    .endpoint(minioFsCossProperties.getEndpoint())
+                    .credentials(minioFsCossProperties.getAccessKey(), minioFsCossProperties.getSecretKey())
+                    .build();
         } catch (Exception e) {
             log.error("Create Minio Client error", e);
         }
@@ -55,9 +49,11 @@ public class MinioEndpoint extends ServerCossEndpoint<MinioFsCossProperties> {
     @Override
     public Bucket createBucket(String bucketName) throws CossException, ServerCossException {
         try {
-            minioClient.makeBucket(bucketName);
+            MakeBucketArgs makeBucketArgs = MakeBucketArgs.builder().bucket(bucketName).build();
+            minioClient.makeBucket(makeBucketArgs);
             Bucket bucket = new Bucket(bucketName);
             bucket.setCreationDate(new Date());
+            log.info("createBucket success [%s]", bucketName);
             return bucket;
         } catch (Exception e) {
             throw new CossException(e);
@@ -73,7 +69,8 @@ public class MinioEndpoint extends ServerCossEndpoint<MinioFsCossProperties> {
             for (io.minio.messages.Bucket b : listBuckets) {
                 Bucket bucket = new Bucket();
                 bucket.setName(b.name());
-                bucket.setCreationDate(b.creationDate());
+                Date date = b.creationDate() != null ? Date.from(b.creationDate().toInstant()) : null;
+                bucket.setCreationDate(date);
                 buckets.add(bucket);
             }
             bucketList.getBucketList().addAll(buckets);
@@ -86,7 +83,9 @@ public class MinioEndpoint extends ServerCossEndpoint<MinioFsCossProperties> {
     @Override
     public void deleteBucket(String bucketName) throws CossException, ServerCossException {
         try {
-            minioClient.removeBucket(bucketName);
+            RemoveBucketArgs removeBucketArgs = RemoveBucketArgs.builder().bucket(bucketName).build();
+            minioClient.removeBucket(removeBucketArgs);
+            log.info("deleteBucket success [%s]", bucketName);
         } catch (Exception e) {
             throw new CossException(e);
         }
@@ -95,9 +94,8 @@ public class MinioEndpoint extends ServerCossEndpoint<MinioFsCossProperties> {
     @Override
     public BucketMetadata getBucketMetadata(String bucketName) throws CossException, ServerCossException {
         try {
-            NotificationConfiguration bucketNotification = minioClient.getBucketNotification(bucketName);
             BucketMetadata bucketMetadata = new BucketMetadata();
-            bucketMetadata.setBucketName(bucketNotification.name);
+            bucketMetadata.setBucketName(bucketName);
         } catch (Exception e) {
             throw new CossException(e);
         }
@@ -125,22 +123,25 @@ public class MinioEndpoint extends ServerCossEndpoint<MinioFsCossProperties> {
             ObjectListing<ObjectSummary> objectListing = new ObjectListing<>();
             objectListing.setBucketName(bucketName);
             objectListing.setPrefix(prefix);
-            prefix = fixKey(prefix,'/');
-            Iterable<Result<Item>> results = minioClient.listObjects(bucketName, prefix,false);
+            prefix = fixKey(prefix, '/');
+            ListObjectsArgs listObjectsArgs = ListObjectsArgs.builder().bucket(bucketName).prefix(prefix).recursive(false).build();
+            Iterable<Result<Item>> results = minioClient.listObjects(listObjectsArgs);
             for (Result<Item> result : results) {
                 Item item = result.get();
                 ObjectSummary objectSummary = new ObjectSummary();
                 objectSummary.setBucketName(bucketName);
-                objectSummary.setKey(subDir(item.objectName(),prefix));
-                if(item.isDir()){
+                objectSummary.setKey(subDir(item.objectName(), prefix));
+                if (item.isDir()) {
 
-                }else{
+                } else {
                     objectSummary.setETag(item.etag());
-                    objectSummary.setSize(item.objectSize());
+                    objectSummary.setSize(item.size());
                     objectSummary.setOwner(new Owner(item.owner().id(), item.owner().displayName()));
-                    objectSummary.setMtime(item.lastModified().getTime());
+                    if (item.lastModified() != null) {
+                        Date date = Date.from(item.lastModified().toInstant());
+                        objectSummary.setMtime(date.getTime());
+                    }
                     objectSummary.setStorageType(kind().getValue());
-
                 }
                 objectListing.getObjectSummaries().add(objectSummary);
             }
@@ -157,15 +158,18 @@ public class MinioEndpoint extends ServerCossEndpoint<MinioFsCossProperties> {
         objectValue.setKey(key);
         ObjectMetadata objectMetadata = new ObjectMetadata();
         try {
-            ObjectStat objectStat = minioClient.statObject(bucketName, key);
+            StatObjectArgs statObjectArgs = StatObjectArgs.builder().bucket(bucketName).object(key).build();
+            ObjectStat objectStat = minioClient.statObject(statObjectArgs);
             objectMetadata.setEtag(objectStat.etag());
             objectMetadata.setContentType(objectStat.contentType());
-            objectMetadata.setAtime(objectStat.createdTime().getTime());
-            objectMetadata.setEtime(objectStat.createdTime().getTime());
-            objectMetadata.setMtime(objectStat.createdTime().getTime());
-            objectMetadata.setContentDisposition(objectStat.matDesc());
-
-            objectValue.setObjectContent(minioClient.getObject(bucketName, key));
+            if (objectStat.createdTime() != null) {
+                Date date = Date.from(objectStat.createdTime().toInstant());
+                objectMetadata.setAtime(date.getTime());
+                objectMetadata.setEtime(date.getTime());
+                objectMetadata.setMtime(date.getTime());
+            }
+            GetObjectArgs getObjectArgs = GetObjectArgs.builder().bucket(bucketName).object(key).build();
+            objectValue.setObjectContent(minioClient.getObject(getObjectArgs));
         } catch (Exception e) {
             throw new CossException(e);
         }
@@ -181,8 +185,10 @@ public class MinioEndpoint extends ServerCossEndpoint<MinioFsCossProperties> {
     @Override
     public CossPutObjectResult putObject(String bucketName, String key, InputStream input, ObjectMetadata metadata) throws CossException, ServerCossException {
         try {
-            key = fixKey(key,'/');
-            minioClient.putObject(bucketName, key, input, null);
+            key = fixKey(key, '/');
+            PutObjectArgs putObjectArgs = PutObjectArgs.builder().bucket(bucketName).object(key).stream(input, -1, 5 * 1024 * 1024).build();
+            minioClient.putObject(putObjectArgs);
+            log.info("putObject success [%s %s]", bucketName, key);
         } catch (Exception e) {
             throw new CossException(e);
         }
@@ -192,7 +198,16 @@ public class MinioEndpoint extends ServerCossEndpoint<MinioFsCossProperties> {
     @Override
     public CopyObjectResult copyObject(String sourceBucketName, String sourceKey, String destinationBucketName, String destinationKey) throws CossException, ServerCossException {
         try {
-            minioClient.copyObject(sourceBucketName,sourceKey,destinationBucketName,destinationKey);
+            sourceKey = fixKey(sourceKey, '/');
+            CopySource copySource = CopySource.builder().bucket(sourceBucketName).object(sourceKey).build();
+
+            //pre copy
+            if (destinationKey.endsWith("/")) {
+                destinationKey = destinationKey + getFileNameFromPath(sourceKey);
+            }
+            log.info("copyObject success from [%s %s] to [%s %s]", sourceBucketName, sourceKey, destinationBucketName, destinationKey);
+            CopyObjectArgs copyObjectArgs = CopyObjectArgs.builder().source(copySource).bucket(destinationBucketName).object(destinationKey).build();
+            minioClient.copyObject(copyObjectArgs);
         } catch (Exception e) {
             throw new CossException(e);
         }
@@ -200,9 +215,19 @@ public class MinioEndpoint extends ServerCossEndpoint<MinioFsCossProperties> {
     }
 
     @Override
+    public CopyObjectResult moveObject(String sourceBucketName, String sourceKey, String destinationBucketName, String destinationKey) throws CossException, ServerCossException {
+        copyObject(sourceBucketName, sourceKey, destinationBucketName, destinationKey);
+        deleteObject(sourceBucketName, sourceKey);
+        log.info("moveObject from success [%s %s] to [%s %s]", sourceBucketName, sourceKey, destinationBucketName, destinationKey);
+        return null;
+    }
+
+    @Override
     public void deleteObject(String bucketName, String key) throws CossException, ServerCossException {
         try {
-            minioClient.removeObject(bucketName, key);
+            RemoveObjectArgs removeObjectArgs = RemoveObjectArgs.builder().bucket(bucketName).object(key).build();
+            minioClient.removeObject(removeObjectArgs);
+            log.info("deleteObject success [%s %s]", bucketName, key);
         } catch (Exception e) {
             throw new CossException(e);
         }
@@ -233,10 +258,6 @@ public class MinioEndpoint extends ServerCossEndpoint<MinioFsCossProperties> {
         return false;
     }
 
-    private void init() throws InvalidPortException, InvalidEndpointException {
-        MinioClient minioClient = new MinioClient("https://play.min.io", "Q3AM3UQ867SPQQA43P2F", "zuf+tfteSlswRu7BJ86wekitnifILbZam1KYY3TG");
-    }
-
     private String fixKey(String str, char beTrim) {
         //str.replaceAll("//","/");
 
@@ -250,14 +271,22 @@ public class MinioEndpoint extends ServerCossEndpoint<MinioFsCossProperties> {
     }
 
 
-    private String subDir(String key,String dir){
-        if(StringUtils.isNotBlank(key) && StringUtils.isNotBlank(dir)){
+    private String subDir(String key, String dir) {
+        if (StringUtils.isNotBlank(key) && StringUtils.isNotBlank(dir)) {
             int i = key.indexOf(dir);
-            if(i==0){
-                key = key.substring(dir.length(),key.length());
+            if (i == 0) {
+                key = key.substring(dir.length(), key.length());
             }
         }
         return key;
+    }
+
+    private String getFileNameFromPath(String path) {
+        int i = path.lastIndexOf("/");
+        if (i >= 0) {
+            return path.substring(i, path.length());
+        }
+        return path;
     }
 
 

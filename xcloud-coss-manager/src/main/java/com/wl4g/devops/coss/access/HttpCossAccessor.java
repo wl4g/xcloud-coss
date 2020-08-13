@@ -26,10 +26,7 @@ import com.wl4g.devops.coss.access.model.ProviderBucketModel;
 import com.wl4g.devops.coss.common.CossEndpoint;
 import com.wl4g.devops.coss.common.CossEndpoint.CossProvider;
 import com.wl4g.devops.coss.common.exception.CossException;
-import com.wl4g.devops.coss.common.model.ACL;
-import com.wl4g.devops.coss.common.model.CossPutObjectResult;
-import com.wl4g.devops.coss.common.model.ObjectMetadata;
-import com.wl4g.devops.coss.common.model.ObjectValue;
+import com.wl4g.devops.coss.common.model.*;
 import com.wl4g.devops.coss.common.model.bucket.Bucket;
 import com.wl4g.devops.coss.common.model.bucket.BucketList;
 import com.wl4g.devops.coss.common.model.metadata.BucketStatusMetaData;
@@ -195,6 +192,30 @@ public class HttpCossAccessor extends BaseController {
 			resp.setData(putObject(param, bucketName, key, file.getInputStream(), metadata));
 			return resp;
 		} catch (IOException e) {
+			throw new CossException(e);
+		}
+	}
+
+	@RequestMapping("copyObject")
+	public RespBase<Object> copyObject(GenericCossParameter param, String sourceBucketName, String sourceKey, String destinationBucketName, String destinationKey) {
+		RespBase<Object> resp = RespBase.create();
+		try {
+			CopyObjectResult copyObjectResult = getCossEndpoint(param).copyObject(sourceBucketName, sourceKey, destinationBucketName, destinationKey);
+			resp.setData(copyObjectResult);
+			return resp;
+		} catch (Exception e) {
+			throw new CossException(e);
+		}
+	}
+
+	@RequestMapping("moveObject")
+	public RespBase<Object> moveObject(GenericCossParameter param, String sourceBucketName, String sourceKey, String destinationBucketName, String destinationKey) {
+		RespBase<Object> resp = RespBase.create();
+		try {
+			CopyObjectResult copyObjectResult = getCossEndpoint(param).moveObject(sourceBucketName, sourceKey, destinationBucketName, destinationKey);
+			resp.setData(copyObjectResult);
+			return resp;
+		} catch (Exception e) {
 			throw new CossException(e);
 		}
 	}
