@@ -10,6 +10,7 @@ import com.wl4g.devops.coss.common.model.bucket.BucketMetadata;
 import com.wl4g.devops.coss.common.model.metadata.BucketStatusMetaData;
 import com.wl4g.devops.coss.config.MinioFsCossProperties;
 import io.minio.*;
+import io.minio.http.Method;
 import io.minio.messages.Item;
 import org.apache.commons.lang3.StringUtils;
 
@@ -17,6 +18,7 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * @author vjay
@@ -28,6 +30,8 @@ public class MinioEndpoint extends ServerCossEndpoint<MinioFsCossProperties> {
 
     private MinioClient minioClient;
 
+    private BucketPolicyArgsManager bucketPolicyArgsManager;
+
     public MinioEndpoint(MinioFsCossProperties config) {
         super(config);
         this.minioFsCossProperties = config;
@@ -36,6 +40,7 @@ public class MinioEndpoint extends ServerCossEndpoint<MinioFsCossProperties> {
                     .endpoint(minioFsCossProperties.getEndpoint())
                     .credentials(minioFsCossProperties.getAccessKey(), minioFsCossProperties.getSecretKey())
                     .build();
+            bucketPolicyArgsManager = new BucketPolicyArgsManager(minioClient);
         } catch (Exception e) {
             log.error("Create Minio Client error", e);
         }
@@ -104,12 +109,32 @@ public class MinioEndpoint extends ServerCossEndpoint<MinioFsCossProperties> {
 
     @Override
     public AccessControlList getBucketAcl(String bucketName) throws CossException, ServerCossException {
-        return null;
+        try {
+            return bucketPolicyArgsManager.getObjectPolicy(bucketName, null);
+        } catch (Exception e) {
+            throw new CossException(e);
+        }
+    }
+
+    @Override
+    public void resetBucketAcl(String bucketName) throws CossException, ServerCossException {
+        try {
+            DeleteBucketPolicyArgs deleteBucketPolicyArgs = DeleteBucketPolicyArgs.builder()
+                    .bucket(bucketName)
+                    .build();
+            minioClient.deleteBucketPolicy(deleteBucketPolicyArgs);
+        } catch (Exception e) {
+            throw new CossException(e);
+        }
     }
 
     @Override
     public void setBucketAcl(String bucketName, ACL acl) throws CossException, ServerCossException {
-
+        try {
+            bucketPolicyArgsManager.setObjectPolicy(bucketName, null, acl);
+        } catch (Exception e) {
+            throw new CossException(e);
+        }
     }
 
     @Override
@@ -168,8 +193,18 @@ public class MinioEndpoint extends ServerCossEndpoint<MinioFsCossProperties> {
                 objectMetadata.setEtime(date.getTime());
                 objectMetadata.setMtime(date.getTime());
             }
+            //TODO get header
+            //Map<String, List<String>> stringListMap = objectStat.httpHeaders();
+
             GetObjectArgs getObjectArgs = GetObjectArgs.builder().bucket(bucketName).object(key).build();
             objectValue.setObjectContent(minioClient.getObject(getObjectArgs));
+
+            //ACL
+            AccessControlList objectPolicy = bucketPolicyArgsManager.getObjectPolicy(bucketName, key);
+            objectMetadata.setAcl(objectPolicy.getAcl());
+            objectMetadata.setReadAcl(objectPolicy.getRealAcl());
+
+
         } catch (Exception e) {
             throw new CossException(e);
         }
@@ -179,6 +214,12 @@ public class MinioEndpoint extends ServerCossEndpoint<MinioFsCossProperties> {
 
     @Override
     public CossPutObjectResult putObjectMetaData(String bucketName, String key, ObjectMetadata metadata) {
+        ACL acl = metadata.getAcl();
+        try {
+            bucketPolicyArgsManager.setObjectPolicy(bucketName, key, acl);
+        } catch (Exception e) {
+            throw new CossException(e);
+        }
         return null;
     }
 
@@ -216,8 +257,14 @@ public class MinioEndpoint extends ServerCossEndpoint<MinioFsCossProperties> {
 
     @Override
     public CopyObjectResult moveObject(String sourceBucketName, String sourceKey, String destinationBucketName, String destinationKey) throws CossException, ServerCossException {
-        copyObject(sourceBucketName, sourceKey, destinationBucketName, destinationKey);
-        deleteObject(sourceBucketName, sourceKey);
+        try {
+            copyObject(sourceBucketName, sourceKey, destinationBucketName, destinationKey);
+            deleteObject(sourceBucketName, sourceKey);
+        } catch (CossException e) {
+            //if this throw error, destination Object will not be del.
+            deleteObject(destinationBucketName, destinationKey);
+        }
+
         log.info("moveObject from success [%s %s] to [%s %s]", sourceBucketName, sourceKey, destinationBucketName, destinationKey);
         return null;
     }
@@ -245,12 +292,25 @@ public class MinioEndpoint extends ServerCossEndpoint<MinioFsCossProperties> {
 
     @Override
     public ObjectAcl getObjectAcl(String bucketName, String key) throws CossException, ServerCossException {
-        return null;
+        //ACL
+        try {
+            AccessControlList objectPolicy = bucketPolicyArgsManager.getObjectPolicy(bucketName, key);
+            ObjectAcl objectAcl = new ObjectAcl();
+            objectAcl.setAcl(objectPolicy.getAcl());
+            objectAcl.setRealAcl(objectPolicy.getRealAcl());
+            return objectAcl;
+        } catch (Exception e) {
+            throw new CossException(e);
+        }
     }
 
     @Override
     public void setObjectAcl(String bucketName, String key, ACL acl) throws CossException, ServerCossException {
-
+        try {
+            bucketPolicyArgsManager.setObjectPolicy(bucketName, key, acl);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
@@ -258,8 +318,29 @@ public class MinioEndpoint extends ServerCossEndpoint<MinioFsCossProperties> {
         return false;
     }
 
-    private String fixKey(String str, char beTrim) {
+    @Override
+    public ShareObject shareObject(String bucketName, String key, Integer expireSec) throws CossException, ServerCossException {
+        try {
+            GetPresignedObjectUrlArgs.Builder builder = GetPresignedObjectUrlArgs.builder().bucket(bucketName).object(key);
+            if (Objects.nonNull(expireSec) && expireSec > 0) {
+                builder.expiry(expireSec);
+            }
+            GetPresignedObjectUrlArgs getPresignedObjectUrlArgs = builder.method(Method.GET).build();
+            String presignedObjectUrl = minioClient.getPresignedObjectUrl(getPresignedObjectUrlArgs);
+            ShareObject shareObject = new ShareObject();
+            shareObject.setUrl(presignedObjectUrl);
+            shareObject.setExpireSec(expireSec);
+            return shareObject;
+        } catch (Exception e) {
+            throw new CossException(e);
+        }
+    }
+
+    public static String fixKey(String str, char beTrim) {
         //str.replaceAll("//","/");
+        if(StringUtils.isBlank(str)){
+            return null;
+        }
 
         int st = 0;
         int len = str.length();

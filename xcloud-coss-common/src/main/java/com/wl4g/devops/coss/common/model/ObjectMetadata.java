@@ -15,15 +15,11 @@
  */
 package com.wl4g.devops.coss.common.model;
 
-import static com.wl4g.components.common.serialize.JacksonUtils.toJSONString;
-import static java.util.Objects.isNull;
-
 import java.util.Map;
 import java.util.TreeMap;
 
-import com.wl4g.devops.coss.common.model.ACL;
-import com.wl4g.devops.coss.common.model.ObjectKey;
-import com.wl4g.devops.coss.common.model.ObjectMetadata;
+import static com.wl4g.components.common.serialize.JacksonUtils.toJSONString;
+import static java.util.Objects.isNull;
 
 /**
  * Base storage object metadata wrapper.
@@ -114,6 +110,8 @@ public class ObjectMetadata implements Comparable<ObjectMetadata> {
 	 * Access control List
 	 */
 	private ACL acl;
+
+	private ACL readAcl;
 
 	/**
 	 * The user's custom metadata, whose prefix in http header is x-oss-meta-.
@@ -222,6 +220,14 @@ public class ObjectMetadata implements Comparable<ObjectMetadata> {
 
 	public void setAcl(ACL acl) {
 		this.acl = acl;
+	}
+
+	public ACL getReadAcl() {
+		return readAcl;
+	}
+
+	public void setReadAcl(ACL readAcl) {
+		this.readAcl = readAcl;
 	}
 
 	public Map<String, String> getUserMetadata() {

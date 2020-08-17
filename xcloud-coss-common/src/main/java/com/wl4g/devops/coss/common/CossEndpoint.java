@@ -231,6 +231,15 @@ public interface CossEndpoint {
         throw new UnsupportedOperationException();
     }
 
+
+    default public ShareObject shareObject(String bucketName, String key, Integer expireSec) throws CossException, ServerCossException {
+        throw new UnsupportedOperationException();
+    }
+
+    default public void resetBucketAcl(String bucketName) throws CossException, ServerCossException {
+        throw new UnsupportedOperationException();
+    }
+
     /**
      * Deletes the specified {@link ObjectValue} by bucket name and object key.
      *

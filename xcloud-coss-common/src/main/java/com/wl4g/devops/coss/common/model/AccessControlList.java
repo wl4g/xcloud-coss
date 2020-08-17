@@ -15,13 +15,13 @@
  */
 package com.wl4g.devops.coss.common.model;
 
-import com.wl4g.devops.coss.common.model.ACL;
-import com.wl4g.devops.coss.common.model.Owner;
 
 public class AccessControlList {
 
 	private ACL acl;
+	private ACL realAcl;
 	private Owner owner;
+	private String config;
 
 	public ACL getAcl() {
 		return acl;
@@ -37,6 +37,22 @@ public class AccessControlList {
 
 	public void setOwner(Owner owner) {
 		this.owner = owner;
+	}
+
+	public ACL getRealAcl() {
+		return realAcl;
+	}
+
+	public void setRealAcl(ACL realAcl) {
+		this.realAcl = realAcl;
+	}
+
+	public String getConfig() {
+		return config;
+	}
+
+	public void setConfig(String config) {
+		this.config = config;
 	}
 
 	@Override

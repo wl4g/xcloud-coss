@@ -15,9 +15,6 @@
  */
 package com.wl4g.devops.coss.common.model;
 
-import com.wl4g.devops.coss.common.model.ACL;
-import com.wl4g.devops.coss.common.model.Owner;
-
 /**
  * COSS Object ACL。
  */
@@ -25,6 +22,7 @@ public class ObjectAcl {
 
 	private Owner owner;
 	private ACL acl;
+	private ACL realAcl;
 
 	public Owner getOwner() {
 		return owner;
@@ -42,4 +40,11 @@ public class ObjectAcl {
 		this.acl = acl;
 	}
 
+	public ACL getRealAcl() {
+		return realAcl;
+	}
+
+	public void setRealAcl(ACL realAcl) {
+		this.realAcl = realAcl;
+	}
 }

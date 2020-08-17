@@ -16,7 +16,6 @@
 package com.wl4g.devops.coss.common.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.wl4g.devops.coss.common.model.ObjectMetadata;
 
 import java.io.Closeable;
 import java.io.IOException;
@@ -60,6 +59,8 @@ public class ObjectValue implements Closeable {
 	/** Object's content */
 	@JsonIgnore
 	private transient InputStream objectContent;
+
+	private String downloadUrl;
 
 	public ObjectValue() {
 		super();
@@ -164,6 +165,15 @@ public class ObjectValue implements Closeable {
 	// public void forcedClose() throws IOException {
 	// this.response.abort();
 	// }
+
+
+	public String getDownloadUrl() {
+		return downloadUrl;
+	}
+
+	public void setDownloadUrl(String downloadUrl) {
+		this.downloadUrl = downloadUrl;
+	}
 
 	@Override
 	public String toString() {

@@ -15,6 +15,7 @@
  */
 package com.wl4g.devops.coss.access;
 
+import com.wl4g.components.common.lang.Assert2;
 import com.wl4g.components.common.web.rest.RespBase;
 import com.wl4g.components.core.framework.operator.GenericOperatorAdapter;
 import com.wl4g.components.core.web.BaseController;
@@ -137,6 +138,7 @@ public class HttpCossAccessor extends BaseController {
 
 	@RequestMapping("getBucketAcl")
 	public RespBase<Object> getBucketAcl(GenericCossParameter param, String bucketName) {
+		Assert2.hasTextOf(bucketName,"bucketName");
 		RespBase<Object> resp = RespBase.create();
 		resp.setData(getCossEndpoint(param).getBucketAcl(bucketName));
 		return resp;
@@ -146,6 +148,13 @@ public class HttpCossAccessor extends BaseController {
 	public RespBase<Object> setBucketAcl(GenericCossParameter param, String bucketName, String acl) {
 		RespBase<Object> resp = RespBase.create();
 		getCossEndpoint(param).setBucketAcl(bucketName, ACL.parse(acl));
+		return resp;
+	}
+
+	@RequestMapping("resetBucketAcl")
+	public RespBase<Object> resetBucketAcl(GenericCossParameter param, String bucketName) {
+		RespBase<Object> resp = RespBase.create();
+		getCossEndpoint(param).resetBucketAcl(bucketName);
 		return resp;
 	}
 
@@ -176,6 +185,14 @@ public class HttpCossAccessor extends BaseController {
 		String downloadUrl = accessConfig.getHttpDownloadBaseUri() + "?bucketName=" + bucketName + "&key=" + key;
 		objValModel.setDownloadUrl(downloadUrl);
 		resp.setData(objValModel);
+		return resp;
+	}
+
+	@RequestMapping("shareObject")
+	public RespBase<Object> shareObject(GenericCossParameter param, String bucketName, String key,Integer expireSec) {
+		RespBase<Object> resp = RespBase.create();
+		ShareObject shareObject = getCossEndpoint(param).shareObject(bucketName, key, expireSec);
+		resp.setData(shareObject);
 		return resp;
 	}
 
