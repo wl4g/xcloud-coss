@@ -1,9 +1,14 @@
 package com.wl4g.devops.coss.minio;
 
+import com.wl4g.components.common.io.ByteStreamUtils;
+import com.wl4g.components.common.lang.Assert2;
 import com.wl4g.devops.coss.ServerCossEndpoint;
 import com.wl4g.devops.coss.common.exception.CossException;
 import com.wl4g.devops.coss.common.exception.ServerCossException;
 import com.wl4g.devops.coss.common.model.*;
+import com.wl4g.devops.coss.common.model.CopyObjectResult;
+import com.wl4g.devops.coss.common.model.ObjectMetadata;
+import com.wl4g.devops.coss.common.model.Owner;
 import com.wl4g.devops.coss.common.model.bucket.Bucket;
 import com.wl4g.devops.coss.common.model.bucket.BucketList;
 import com.wl4g.devops.coss.common.model.bucket.BucketMetadata;
@@ -11,7 +16,7 @@ import com.wl4g.devops.coss.common.model.metadata.BucketStatusMetaData;
 import com.wl4g.devops.coss.config.MinioFsCossProperties;
 import io.minio.*;
 import io.minio.http.Method;
-import io.minio.messages.Item;
+import io.minio.messages.*;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.InputStream;
@@ -319,18 +324,66 @@ public class MinioEndpoint extends ServerCossEndpoint<MinioFsCossProperties> {
     }
 
     @Override
-    public ShareObject shareObject(String bucketName, String key, Integer expireSec) throws CossException, ServerCossException {
+    public ShareObject shareObject(String bucketName, String key, Integer expireSec,Boolean presigned) throws CossException, ServerCossException {
         try {
+            key = fixKey(key,'/');
             GetPresignedObjectUrlArgs.Builder builder = GetPresignedObjectUrlArgs.builder().bucket(bucketName).object(key);
             if (Objects.nonNull(expireSec) && expireSec > 0) {
                 builder.expiry(expireSec);
             }
-            GetPresignedObjectUrlArgs getPresignedObjectUrlArgs = builder.method(Method.GET).build();
-            String presignedObjectUrl = minioClient.getPresignedObjectUrl(getPresignedObjectUrlArgs);
+            String url;
+            if(presigned){
+                GetPresignedObjectUrlArgs getPresignedObjectUrlArgs = builder.method(Method.GET).build();
+                url = minioClient.getPresignedObjectUrl(getPresignedObjectUrlArgs);
+            }else{
+                url = minioClient.getObjectUrl(bucketName, key);
+            }
             ShareObject shareObject = new ShareObject();
-            shareObject.setUrl(presignedObjectUrl);
+            shareObject.setUrl(url);
             shareObject.setExpireSec(expireSec);
             return shareObject;
+        } catch (Exception e) {
+            throw new CossException(e);
+        }
+    }
+
+    @Override
+    public String selectObjectContent(String bucket,String key,String type,
+                                      CompressionType compressionType,JsonType jsonType,//for json
+                                      Character recordDelimiter,Boolean useFileHeaderInfo,// for csv
+                                      String sqlExpression
+                                      )
+            throws CossException {
+
+        Assert2.hasTextOf(sqlExpression,"sqlExpression");
+        FileHeaderInfo fileHeaderInfo = FileHeaderInfo.NONE;
+        if(useFileHeaderInfo){
+            fileHeaderInfo = FileHeaderInfo.USE;
+        }
+
+        InputSerialization is;
+        OutputSerialization os;
+        if(StringUtils.equals(type,"CSV")){
+            is = new InputSerialization(compressionType, false, null, null, fileHeaderInfo, null, null, null);
+            os = new OutputSerialization(null, null, null, QuoteFields.ALWAYS, recordDelimiter);
+        }else if(StringUtils.equals(type,"JSON")){
+            is = new InputSerialization(compressionType, jsonType);
+            os = new OutputSerialization(null);
+        }else{
+            throw new UnsupportedOperationException();
+        }
+
+        try {
+            SelectResponseStream stream = minioClient.selectObjectContent(
+                    SelectObjectContentArgs.builder()
+                            .bucket(bucket)
+                            .object(key)
+                            .sqlExpression(sqlExpression)
+                            .inputSerialization(is)
+                            .outputSerialization(os)
+                            .requestProgress(false)
+                            .build());
+            return ByteStreamUtils.readFullyToString(stream);
         } catch (Exception e) {
             throw new CossException(e);
         }

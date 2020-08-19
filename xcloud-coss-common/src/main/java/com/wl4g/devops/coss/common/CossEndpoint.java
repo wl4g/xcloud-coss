@@ -22,6 +22,8 @@ import com.wl4g.devops.coss.common.model.bucket.Bucket;
 import com.wl4g.devops.coss.common.model.bucket.BucketList;
 import com.wl4g.devops.coss.common.model.bucket.BucketMetadata;
 import com.wl4g.devops.coss.common.model.metadata.BucketStatusMetaData;
+import io.minio.messages.CompressionType;
+import io.minio.messages.JsonType;
 
 import java.io.InputStream;
 import java.net.URL;
@@ -232,11 +234,20 @@ public interface CossEndpoint {
     }
 
 
-    default public ShareObject shareObject(String bucketName, String key, Integer expireSec) throws CossException, ServerCossException {
+    default public ShareObject shareObject(String bucketName, String key, Integer expireSec, Boolean presigned) throws CossException, ServerCossException {
         throw new UnsupportedOperationException();
     }
 
     default public void resetBucketAcl(String bucketName) throws CossException, ServerCossException {
+        throw new UnsupportedOperationException();
+    }
+
+    default public String selectObjectContent(String bucket, String key, String type,
+                                              CompressionType compressionType, JsonType jsonType,//for json
+                                              Character recordDelimiter, Boolean useFileHeaderInfo,// for csv
+                                              String sqlExpression
+    )
+            throws CossException{
         throw new UnsupportedOperationException();
     }
 

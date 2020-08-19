@@ -2,9 +2,10 @@ package com.wl4g.devops.coss.utils;
 
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
+import com.wl4g.components.common.io.ByteStreamUtils;
 import io.minio.*;
 import io.minio.errors.*;
-import io.minio.messages.Tags;
+import io.minio.messages.*;
 
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -21,6 +22,7 @@ import java.util.Map;
 public class MinioTests {
 
     private static MinioClient buildMinioClient() {
+
         return MinioClient.builder()
                 .endpoint("http://10.0.0.160:9000")
                 .credentials("minioadmin", "minioadmin")
@@ -32,10 +34,12 @@ public class MinioTests {
         //getObjectTags();
 
         //putObjectTest();
-        statObjectTest();
+        //statObjectTest();
 
         //setBucketPolicyTest();
         //getBucketPolicyTest();
+
+        s3SelectTest();
 
     }
 
@@ -204,12 +208,47 @@ public class MinioTests {
     }
 
 
-    /**
-     * 单个object， -- private（私有RW），public（公共读）， public（公共读写）
-     * bucket目录， -- private（私有RW），public（公共读）， public（公共读写）
-     * 目录， 递归 父允许子的不允许。。。。
-     * 一要区分显式拒绝和隐式拒绝，
-     */
+    public static void s3SelectTest() throws IOException, InvalidKeyException, InvalidResponseException, InsufficientDataException, NoSuchAlgorithmException, ServerException, InternalException, XmlParserException, InvalidBucketNameException, ErrorResponseException {
+
+        /*InputSerialization inputSerialization = new InputSerialization();
+
+        OutputSerialization outputSerialization = new OutputSerialization(' ');
+        SelectObjectContentArgs selectObjectContentArgs = SelectObjectContentArgs.builder()
+                .inputSerialization(inputSerialization)
+                .outputSerialization(outputSerialization)
+                .requestProgress(false)
+                .bucket("mybucket1")
+                .object("minioselect.json")
+                .sqlExpression("select * from S3Object[*] limit 10")
+                .build();
+        SelectResponseStream selectResponseStream = buildMinioClient().selectObjectContent(selectObjectContentArgs);*/
+
+
+        //@see https://docs.min.io/docs/java-client-api-reference.html#selectObjectContent
+        String sqlExpression = "select * from S3Object limit 10";
+        //InputSerialization is = new InputSerialization(null, false, null, null, FileHeaderInfo.NONE, null, null, null);
+        InputSerialization is = new InputSerialization(CompressionType.NONE,JsonType.DOCUMENT);
+        //OutputSerialization os = new OutputSerialization(null, null, null, QuoteFields.ALWAYS, null);
+        OutputSerialization os = new OutputSerialization('\n');
+        SelectResponseStream stream =
+                buildMinioClient().selectObjectContent(
+                        SelectObjectContentArgs.builder()
+                                .bucket("mybucket1")
+                                .object("minioselect.json")
+                                .sqlExpression(sqlExpression)
+                                .inputSerialization(is)
+                                .outputSerialization(os)
+                                .requestProgress(false)
+                                .build());
+
+
+
+        String s = ByteStreamUtils.readFullyToString(stream);
+        System.out.println(s);
+    }
+
+
+
 
 
 

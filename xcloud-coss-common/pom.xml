@@ -31,6 +31,10 @@
 			<groupId>com.wl4g</groupId>
 			<artifactId>xcloud-components-common</artifactId>
 		</dependency>
+		<dependency>
+			<groupId>io.minio</groupId>
+			<artifactId>minio</artifactId>
+		</dependency>
 	</dependencies>
 	<build>
 		<resources>

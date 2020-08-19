@@ -34,6 +34,8 @@ import com.wl4g.devops.coss.common.model.metadata.BucketStatusMetaData;
 import com.wl4g.devops.coss.config.CossAccessProperties;
 import com.wl4g.devops.coss.config.StandardFSCossProperties;
 import com.wl4g.devops.coss.natives.MetadataIndexManager;
+import io.minio.messages.CompressionType;
+import io.minio.messages.JsonType;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -189,9 +191,12 @@ public class HttpCossAccessor extends BaseController {
 	}
 
 	@RequestMapping("shareObject")
-	public RespBase<Object> shareObject(GenericCossParameter param, String bucketName, String key,Integer expireSec) {
+	public RespBase<Object> shareObject(GenericCossParameter param, String bucketName, String key,Integer expireSec,Boolean presigned) {
 		RespBase<Object> resp = RespBase.create();
-		ShareObject shareObject = getCossEndpoint(param).shareObject(bucketName, key, expireSec);
+		if(Objects.isNull(presigned)){
+			presigned = false;
+		}
+		ShareObject shareObject = getCossEndpoint(param).shareObject(bucketName, key, expireSec,presigned);
 		resp.setData(shareObject);
 		return resp;
 	}
@@ -328,6 +333,18 @@ public class HttpCossAccessor extends BaseController {
 		// bucketName + currentPath + dirName);
 		// path.mkdirs();
 		// isTrue(path.exists(), "createBucketMeta dir fail");
+		return resp;
+	}
+
+	@RequestMapping("selectObjectContent")
+	public RespBase<Object> selectObjectContent(GenericCossParameter param, String bucketName, String key,
+												String type,
+												CompressionType compressionType, JsonType jsonType,//for json
+												Character recordDelimiter, Boolean useFileHeaderInfo,// for csv
+												String sqlExpression) {
+		RespBase<Object> resp = RespBase.create();
+		String s = getCossEndpoint(param).selectObjectContent(bucketName, key, type, compressionType, jsonType, recordDelimiter, useFileHeaderInfo, sqlExpression);
+		resp.setData(s);
 		return resp;
 	}
 
