@@ -369,6 +369,9 @@ public class MinioEndpoint extends ServerCossEndpoint<MinioFsCossProperties> {
         }else if(StringUtils.equals(type,"JSON")){
             is = new InputSerialization(compressionType, jsonType);
             os = new OutputSerialization(null);
+        }else if(StringUtils.equals(type,"Parquet")){
+            is = new InputSerialization();
+            os = new OutputSerialization(null);
         }else{
             throw new UnsupportedOperationException();
         }
