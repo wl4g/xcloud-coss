@@ -37,6 +37,10 @@ spring:
         hdfs:
           endpoint-hdfs-root-uri: hdfs://owner-node3:8020/coss-bucket
         native:
+        minio:
+          endpoint: http://10.0.0.160:9000
+          accessKey: minioadmin
+          secretKey: minioadmin
         access:
   # Datasource configuration.
   datasource:
