@@ -17,7 +17,7 @@ package com.wl4g.devops.coss.access.model;
 
 import javax.validation.constraints.NotBlank;
 
-import com.wl4g.shell.annotation.ShellOption;
+import com.wl4g.shell.common.annotation.ShellOption;
 
 /**
  * Generic COSS accessor parameter.

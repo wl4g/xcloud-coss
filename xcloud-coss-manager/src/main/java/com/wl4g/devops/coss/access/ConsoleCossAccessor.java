@@ -41,9 +41,9 @@ import com.wl4g.devops.coss.common.model.CossPutObjectResult;
 import com.wl4g.devops.coss.common.model.bucket.Bucket;
 import com.wl4g.devops.coss.common.model.bucket.BucketList;
 import com.wl4g.devops.coss.common.model.bucket.BucketMetadata;
-import com.wl4g.shell.annotation.ShellComponent;
-import com.wl4g.shell.annotation.ShellMethod;
-import com.wl4g.shell.annotation.ShellOption;
+import com.wl4g.shell.common.annotation.ShellMethod;
+import com.wl4g.shell.common.annotation.ShellOption;
+import com.wl4g.shell.springboot.annotation.ShellComponent;
 
 /**
  * Console based coss accessor
